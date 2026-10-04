@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}لوحة تحكم التاجر{% endblock %} - {{ settings.store_name }}</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <link rel="stylesheet" href="/static/css/style.css?v=desktop_stable_v7">
+  <style>
+    html, body {
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      min-height: 100vh !important;
+      background: #f8fafc !important;
+      font-family: 'Cairo', system-ui, -apple-system, sans-serif !important;
+      direction: rtl !important;
+      overflow-x: hidden !important;
+    }
+
+    .admin-layout {
+      display: flex !important;
+      min-height: 100vh !important;
+      width: 100% !important;
+    }
+
+    /* الشريط الجانبي للوحة الإدارة */
+    .admin-sidebar {
+      width: 250px !important;
+      min-width: 250px !important;
+      background: #0f172a !important;
+      color: #cbd5e1 !important;
+      padding: 1.5rem 1rem !important;
+      border-left: 1px solid #1e293b !important;
+      flex-shrink: 0 !important;
+      box-sizing: border-box !important;
+      display: block !important;
+      visibility: visible !important;
+      position: sticky !important;
+      top: 0 !important;
+      height: 100vh !important;
+    }
+
+    .admin-nav {
+      list-style: none !important;
+      margin-top: 1.8rem !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 0.5rem !important;
+    }
+
+    .admin-nav li {
+      margin-bottom: 0 !important;
+    }
+
+    .admin-nav a {
+      display: flex !important;
+      align-items: center !important;
+      gap: 0.8rem !important;
+      padding: 0.75rem 1rem !important;
+      border-radius: var(--radius-md) !important;
+      font-weight: 600 !important;
+      color: #94a3b8 !important;
+      transition: var(--transition) !important;
+      text-decoration: none !important;
+      white-space: nowrap !important;
+    }
+
+    .admin-nav a:hover, .admin-nav a.active {
+      background: #1e293b !important;
+      color: #fff !important;
+    }
+
+    .admin-nav a.active {
+      border-right: 4px solid var(--primary-color) !important;
+    }
+
+    /* المحتوى الرئيسي للوحة الإدارة */
+    .admin-content {
+      flex: 1 1 auto !important;
+      padding: 1.5rem 2rem !important;
+      background: #f8fafc !important;
+      box-sizing: border-box !important;
+      min-width: 0 !important; /* يمنع انضغاط المحتوى واختفاء الجداول */
+      overflow-x: hidden !important;
+    }
+
+    .admin-topbar {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      margin-bottom: 1.8rem !important;
+      background: #fff !important;
+      padding: 1rem 1.5rem !important;
+      border-radius: var(--radius-md) !important;
+      border: 1px solid var(--border-color) !important;
+      box-shadow: var(--shadow-sm) !important;
+      flex-wrap: wrap !important;
+      gap: 1rem !important;
+    }
+
+    .stat-card {
+      background: #fff !important;
+      border: 1px solid var(--border-color) !important;
+      border-radius: var(--radius-md) !important;
+      padding: 1.25rem !important;
+      box-shadow: var(--shadow-sm) !important;
+    }
+
+    /* حاوية الجداول المتجاوبة - تضمن ظهور كافة الأعمدة والتفاصيل دون أي اقتطاع */
+    .table-responsive {
+      width: 100% !important;
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      margin-top: 1rem !important;
+    }
+
+    .table-responsive table {
+      width: 100% !important;
+      min-width: 700px !important;
+      border-collapse: collapse !important;
+    }
+
+    /* التوافق مع شاشات الهواتف والتابلت حتى لا ينحشر المحتوى */
+    @media (max-width: 850px) {
+      .admin-layout {
+        flex-direction: column !important;
+      }
+
+      .admin-sidebar {
+        width: 100% !important;
+        min-width: 100% !important;
+        height: auto !important;
+        position: static !important;
+        padding: 1rem !important;
+      }
+
+      .admin-nav {
+        margin-top: 0.8rem !important;
+        flex-direction: row !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding-bottom: 0.4rem !important;
+        scrollbar-width: none !important;
+      }
+
+      .admin-nav::-webkit-scrollbar {
+        display: none !important;
+      }
+
+      .admin-nav li {
+        flex-shrink: 0 !important;
+      }
+
+      .admin-nav a {
+        padding: 0.45rem 0.85rem !important;
+        font-size: 0.85rem !important;
+        border-radius: var(--radius-full) !important;
+        background: #1e293b !important;
+      }
+
+      .admin-nav a.active {
+        border-right: none !important;
+        background: var(--primary-color) !important;
+        color: #fff !important;
+      }
+
+      .admin-content {
+        padding: 1rem !important;
+        width: 100% !important;
+      }
+
+      .admin-topbar {
+        padding: 0.8rem 1rem !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- الشريط الجانبي / العلوي للوحة الإدارة -->
+    <aside class="admin-sidebar">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:0.8rem;">
+          {% if settings.store_logo_url %}
+            <img src="{{ settings.store_logo_url }}" alt="شعار" style="max-height:38px;max-width:38px;object-fit:contain;border-radius:4px;background:#fff;padding:2px;">
+          {% else %}
+            <i class="bi bi-shield-lock-fill" style="color:var(--primary-color);font-size:1.8rem;"></i>
+          {% endif %}
+          <div>
+            <h3 style="color:#fff;font-size:1.05rem;font-weight:700;">لوحة التاجر</h3>
+            <span style="font-size:0.75rem;color:#64748b;">{{ settings.store_name }}</span>
+          </div>
+        </div>
+
+        <a href="/" target="_blank" style="color:#34d399;font-size:0.85rem;display:inline-flex;align-items:center;gap:0.3rem;">
+          <i class="bi bi-box-arrow-up-right"></i> عرض المتجر
+        </a>
+      </div>
+
+      <!-- قائمة تبويبات لوحة التحكم الخمسة الكاملة -->
+      <ul class="admin-nav">
+        <li>
+          <a href="/admin/dashboard" class="{% if active_tab == 'dashboard' %}active{% endif %}">
+            <i class="bi bi-speedometer2"></i> الإحصائيات
+          </a>
+        </li>
+        <li>
+          <a href="/admin/orders" class="{% if active_tab == 'orders' %}active{% endif %}">
+            <i class="bi bi-box-seam"></i> إدارة الطلبات
+          </a>
+        </li>
+        <li>
+          <a href="/admin/products" class="{% if active_tab == 'products' %}active{% endif %}">
+            <i class="bi bi-tags"></i> إدارة المنتجات
+          </a>
+        </li>
+        <li>
+          <a href="/admin/settings" class="{% if active_tab == 'settings' %}active{% endif %}">
+            <i class="bi bi-gear"></i> إعدادات الشعار والمتجر
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- المحتوى الرئيسي للوحة التحكم -->
+    <main class="admin-content">
+      <div class="admin-topbar">
+        <div>
+          <h2 style="font-size:1.3rem;font-weight:800;color:var(--secondary-color);margin:0;">{% block page_title %}{% endblock %}</h2>
+        </div>
+        <div style="display:flex;align-items:center;gap:1rem;">
+          <span style="font-size:0.9rem;color:var(--text-muted);display:flex;align-items:center;gap:0.4rem;">
+            <i class="bi bi-person-badge-fill" style="color:var(--primary-color);font-size:1.1rem;"></i>
+            المشرف: <strong style="color:var(--secondary-color);">{{ settings.admin_username }}</strong>
+          </span>
+          <a href="/" class="btn btn-outline btn-sm" style="color:var(--text-main);border-color:var(--border-color);background:#f8fafc;">
+            <i class="bi bi-arrow-right"></i> الخروج للمتجر
+          </a>
+        </div>
+      </div>
+
+      {% block admin_body %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>

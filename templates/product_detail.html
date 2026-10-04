@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - {{ settings.store_name }}{% endblock %}
+{% block meta_description %}{{ product.description[:160] }}{% endblock %}
+
+{% block og_type %}product{% endblock %}
+{% block og_title %}{{ product.name }} | {{ settings.store_name }}{% endblock %}
+{% block og_description %}{{ product.description[:180] }}{% endblock %}
+{% block og_image %}{{ product.image_url }}{% endblock %}
+
+{% block extra_head %}
+<!-- البيانات المنظمة لمحركات البحث Schema.org JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": "{{ product.name }}",
+  "image": ["{{ product.image_url }}"],
+  "description": "{{ product.description }}",
+  "sku": "PRD-{{ product.id }}",
+  "offers": {
+    "@type": "Offer",
+    "url": "{{ request_url }}",
+    "priceCurrency": "YER",
+    "price": "{{ product.price }}",
+    "availability": "https://schema.org/InStock",
+    "itemCondition": "https://schema.org/NewCondition"
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:2.5rem;">
+  <!-- Breadcrumb -->
+  <div style="font-size:0.9rem;color:var(--text-muted);margin-bottom:1.5rem;">
+    <a href="/">الرئيسية</a> &gt; 
+    <a href="/products">المنتجات</a> &gt; 
+    <a href="/products?category={{ product.category_slug }}">{{ product.category_name }}</a> &gt; 
+    <span style="color:var(--text-main);font-weight:600;">{{ product.name }}</span>
+  </div>
+
+  <div class="product-detail-layout">
+    <!-- الصورة -->
+    <div class="detail-img-box">
+      <img src="{{ product.image_url }}" alt="{{ product.name }}">
+    </div>
+
+    <!-- التفاصيل والشراء -->
+    <div class="detail-content">
+      <span style="color:var(--primary-color);font-weight:700;font-size:0.9rem;">
+        {{ product.category_name }}
+      </span>
+      <h1>{{ product.name }}</h1>
+
+      <div class="detail-meta">
+        <span class="stock-tag">
+          <i class="bi bi-check2-circle"></i> متوفر في المخزن ({{ product.stock }} قطعة)
+        </span>
+        <span>رمز المنتج: #PRD-{{ product.id }}</span>
+      </div>
+
+      <div class="product-price-row" style="margin-bottom:1.5rem;">
+        <span class="current-price" data-price-yer="{{ product.price }}" style="font-size:2rem;">
+          {{ product.price|int }} {{ settings.store_currency }}
+        </span>
+        {% if product.compare_at_price and product.compare_at_price > product.price %}
+        <span class="old-price" data-price-yer="{{ product.compare_at_price }}" style="font-size:1.3rem;">
+          {{ product.compare_at_price|int }} {{ settings.store_currency }}
+        </span>
+        <span class="badge-discount" style="position:static;">
+          وفر {{ (((product.compare_at_price - product.price) / product.compare_at_price) * 100)|int }}%
+        </span>
+        {% endif %}
+      </div>
+
+      <p class="detail-desc">
+        {{ product.description }}
+      </p>
+
+      <!-- صندوق الشراء -->
+      <div class="purchase-box">
+        <label style="display:block;font-weight:700;margin-bottom:0.5rem;font-size:0.9rem;">الكمية المطلوبة:</label>
+        <div class="qty-control">
+          <button class="qty-btn" id="btn-qty-minus">-</button>
+          <input type="number" id="product-qty-input" value="1" min="1" max="{{ product.stock }}" class="qty-input">
+          <button class="qty-btn" id="btn-qty-plus">+</button>
+        </div>
+
+        <div class="purchase-actions">
+          <button class="btn btn-primary" id="btn-detail-add-cart"
+                  data-id="{{ product.id }}"
+                  data-name="{{ product.name }}"
+                  data-price="{{ product.price }}"
+                  data-image="{{ product.image_url }}">
+            <i class="bi bi-cart-plus"></i> إضافة إلى السلة
+          </button>
+
+          <!-- زر الطلب السريع بالواتساب للمنتج مباشرة مع العملة المختارة -->
+          <a href="https://wa.me/{{ settings.store_whatsapp }}?text={{ ('مرحباً، أود طلب المنتج التالي مباشرة:\nاسم المنتج: ' ~ product.name ~ '\nالسعر: ' ~ (product.price|int) ~ ' ' ~ settings.store_currency ~ '\nرابط المنتج: ' ~ request_url)|urlencode }}" 
+             target="_blank" 
+             class="btn btn-whatsapp">
+            <i class="bi bi-whatsapp"></i> طلب فوري بواتساب
+          </a>
+        </div>
+      </div>
+
+      <!-- مميزات الشراء والضمان -->
+      <div style="margin-top:2rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem;font-size:0.85rem;color:var(--text-muted);">
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <i class="bi bi-shield-check" style="color:var(--accent-color);font-size:1.2rem;"></i>
+          <span>ضمان أصلي 100% مع إرجاع سهل</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <i class="bi bi-truck" style="color:var(--primary-color);font-size:1.2rem;"></i>
+          <span>توصيل سريع لباب منزلك</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

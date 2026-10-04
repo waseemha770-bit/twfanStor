@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}{{ settings.store_name }} - الرعاية والحلول البيطرية المعتمدة{% endblock %}
+
+{% block content %}
+<!-- قسم Hero -->
+<section class="hero-section">
+  <div class="container">
+    <div class="hero-grid">
+      <div class="hero-content">
+        <span style="background:rgba(52,211,153,0.25);color:#6ee7b7;padding:0.4rem 1rem;border-radius:var(--radius-full);font-size:0.85rem;font-weight:700;display:inline-block;margin-bottom:1rem;">
+          🩺 رعاية بيطرية متكاملة وأدوية أصلية 100%
+        </span>
+        <h1>صيدليتكم ومستودعكم البيطري الأول لحماية وتنمية الثروة الحيوانية</h1>
+        <p>{{ settings.store_description }}</p>
+        <div class="hero-cta">
+          <a href="/products" class="btn btn-primary">
+            <i class="bi bi-capsule"></i> تصفح الأدوية والمستلزمات
+          </a>
+          <a href="https://wa.me/{{ settings.store_whatsapp }}" target="_blank" class="btn btn-whatsapp">
+            <i class="bi bi-whatsapp"></i> استشارة وطلب عبر واتساب
+          </a>
+        </div>
+      </div>
+      <div class="hero-image" style="display:flex;justify-content:center;">
+        <img src="https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=600&auto=format&fit=crop&q=80" 
+             alt="رعاية الثروة الحيوانية" 
+             style="border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);max-height:340px;width:100%;object-fit:cover;border:2px solid rgba(255,255,255,0.2);">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- شريط المميزات البيطرية -->
+<div class="container" id="features">
+  <div class="features-bar">
+    <div class="feature-box">
+      <div class="feature-icon" style="background:#ecfdf5;color:var(--primary-color);">
+        <i class="bi bi-shield-check"></i>
+      </div>
+      <div class="feature-info">
+        <h4>أدوية ولقاحات أصلية</h4>
+        <p>مصرحة ومطابقة لأعلى المعايير</p>
+      </div>
+    </div>
+
+    <div class="feature-box">
+      <div class="feature-icon" style="background:#f0fdf4;color:var(--whatsapp-color);">
+        <i class="bi bi-whatsapp"></i>
+      </div>
+      <div class="feature-info">
+        <h4>طلب واستشارة بواتساب</h4>
+        <p>رد فوري من الفريق البيطري</p>
+      </div>
+    </div>
+
+    <div class="feature-box">
+      <div class="feature-icon" style="background:#eff6ff;color:var(--accent-color);">
+        <i class="bi bi-snow"></i>
+      </div>
+      <div class="feature-info">
+        <h4>شحن مبرد آمن</h4>
+        <p>يحافظ على فعالية اللقاحات</p>
+      </div>
+    </div>
+
+    <div class="feature-box">
+      <div class="feature-icon" style="background:#fef3c7;color:var(--warning-color);">
+        <i class="bi bi-currency-exchange"></i>
+      </div>
+      <div class="feature-info">
+        <h4>دعم عدة عملات</h4>
+        <p>الدولار، اليمني، والسعودي</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- الأقسام والتصنيفات البيطرية -->
+<section class="container" id="categories" style="padding-top:2rem;">
+  <div class="section-header">
+    <div>
+      <h2 class="section-title">أقسام الصيدلية والمزرعة</h2>
+      <p class="section-subtitle">اختر القسم لاستعراض العلاجات والتحصينات والمعدات المناسبة لقطيعك</p>
+    </div>
+  </div>
+
+  <div class="categories-grid">
+    {% for cat in categories %}
+    <a href="/products?category={{ cat.slug }}" class="category-card">
+      <i class="bi {{ cat.icon }}"></i>
+      <h3>{{ cat.name }}</h3>
+      <span>{{ cat.description }}</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- الأدوية والمنتجات البيطرية المميزة -->
+<section class="container">
+  <div class="section-header">
+    <div>
+      <h2 class="section-title">أبرز الأدوية والمكملات الأكثر طلباً</h2>
+      <p class="section-subtitle">علاجات ومغذيات موثوقة أثبتت كفاءة عالية لدى المربين والمزارع</p>
+    </div>
+    <a href="/products" style="color:var(--primary-color);font-weight:700;display:flex;align-items:center;gap:0.3rem;">
+      عرض كافة الأدوية <i class="bi bi-arrow-left"></i>
+    </a>
+  </div>
+
+  <div class="products-grid">
+    {% for product in featured_products %}
+    <div class="product-card">
+      <div class="product-thumb">
+        <a href="/product/{{ product.id }}">
+          <img src="{{ product.image_url }}" alt="{{ product.name }}" loading="lazy">
+        </a>
+        <span class="badge-featured">موصى به</span>
+        {% if product.compare_at_price and product.compare_at_price > product.price %}
+        <span class="badge-discount">
+          وفر {{ (((product.compare_at_price - product.price) / product.compare_at_price) * 100)|int }}%
+        </span>
+        {% endif %}
+      </div>
+      <div class="product-body">
+        <span class="product-category">{{ product.category_name }}</span>
+        <h3 class="product-title">
+          <a href="/product/{{ product.id }}">{{ product.name }}</a>
+        </h3>
+        <div class="product-price-row">
+          <span class="current-price" data-price-yer="{{ product.price }}">{{ product.price|int }} {{ settings.store_currency }}</span>
+          {% if product.compare_at_price %}
+          <span class="old-price" data-price-yer="{{ product.compare_at_price }}">{{ product.compare_at_price|int }} {{ settings.store_currency }}</span>
+          {% endif %}
+        </div>
+        <div class="product-actions">
+          <button class="btn btn-primary btn-sm btn-add-cart" 
+                  data-id="{{ product.id }}" 
+                  data-name="{{ product.name }}" 
+                  data-price="{{ product.price }}" 
+                  data-image="{{ product.image_url }}">
+            <i class="bi bi-cart-plus"></i> أضف للسلة
+          </button>
+          <a href="/product/{{ product.id }}" class="btn btn-outline btn-sm" style="color:var(--text-main);border-color:var(--border-color);">
+            الجرعات والتفاصيل
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- بانر الاستشارة البيطرية والطلب عبر واتساب -->
+<section class="container" style="margin-bottom:4rem;">
+  <div style="background:linear-gradient(135deg, #047857 0%, #064e3b 100%);color:#fff;padding:2.5rem;border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:2rem;">
+    <div>
+      <h3 style="font-size:1.75rem;font-weight:800;margin-bottom:0.5rem;">تحتاج إلى استشارة لتشخيص حالة أو تحديد الجرعة المناسبة؟</h3>
+      <p style="color:#d1fae5;font-size:1.05rem;">أطباء وفنيو متجر الطوفان البيطري على تواصل مباشر عبر واتساب لتقديم النصيحة الطبية السليمة وتجهيز طلبيتك فوراً.</p>
+    </div>
+    <a href="https://wa.me/{{ settings.store_whatsapp }}?text={{ 'مرحباً، أود استشارة بيطرية بخصوص علاج للماشية/الدواجن'|urlencode }}" 
+       target="_blank" 
+       class="btn btn-whatsapp" 
+       style="padding:0.9rem 2rem;font-size:1.1rem;background:#25d366;color:#fff;">
+      <i class="bi bi-whatsapp"></i> استشارة بيطرية مباشرة
+    </a>
+  </div>
+</section>
+{% endblock %}

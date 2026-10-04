@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}جميع المنتجات - {{ settings.store_name }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:2rem;">
+  <div style="background:var(--card-bg);padding:1.5rem;border-radius:var(--radius-md);border:1px solid var(--border-color);margin-bottom:2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+    <div>
+      <h1 style="font-size:1.6rem;font-weight:800;color:var(--secondary-color);">
+        {% if current_category %}
+          قسم: {{ current_category.name }}
+        {% else %}
+          جميع المنتجات المتاحة
+        {% endif %}
+      </h1>
+      <p style="color:var(--text-muted);font-size:0.9rem;">عرض {{ products|length }} منتج</p>
+    </div>
+
+    <!-- شريط البحث والتصفية -->
+    <form action="/products" method="GET" style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <input type="text" name="q" value="{{ query or '' }}" placeholder="ابحث عن منتج..." class="form-control" style="width:220px;padding:0.5rem 0.8rem;">
+      
+      <select name="category" class="form-control" style="width:180px;padding:0.5rem 0.8rem;" onchange="this.form.submit()">
+        <option value="">جميع الأقسام</option>
+        {% for cat in categories %}
+        <option value="{{ cat.slug }}" {% if current_category and current_category.slug == cat.slug %}selected{% endif %}>
+          {{ cat.name }}
+        </option>
+        {% endfor %}
+      </select>
+
+      <button type="submit" class="btn btn-primary btn-sm">
+        <i class="bi bi-search"></i> بحث
+      </button>
+    </form>
+  </div>
+
+  {% if products %}
+  <div class="products-grid">
+    {% for product in products %}
+    <div class="product-card">
+      <div class="product-thumb">
+        <a href="/product/{{ product.id }}">
+          <img src="{{ product.image_url }}" alt="{{ product.name }}" loading="lazy">
+        </a>
+        {% if product.is_featured %}
+        <span class="badge-featured">مميز</span>
+        {% endif %}
+        {% if product.compare_at_price and product.compare_at_price > product.price %}
+        <span class="badge-discount">
+          خصم {{ (((product.compare_at_price - product.price) / product.compare_at_price) * 100)|int }}%
+        </span>
+        {% endif %}
+      </div>
+      <div class="product-body">
+        <span class="product-category">{{ product.category_name }}</span>
+        <h3 class="product-title">
+          <a href="/product/{{ product.id }}">{{ product.name }}</a>
+        </h3>
+        <div class="product-price-row">
+          <span class="current-price" data-price-yer="{{ product.price }}">{{ product.price|int }} {{ settings.store_currency }}</span>
+          {% if product.compare_at_price %}
+          <span class="old-price" data-price-yer="{{ product.compare_at_price }}">{{ product.compare_at_price|int }} {{ settings.store_currency }}</span>
+          {% endif %}
+        </div>
+        <div class="product-actions">
+          <button class="btn btn-primary btn-sm btn-add-cart" 
+                  data-id="{{ product.id }}" 
+                  data-name="{{ product.name }}" 
+                  data-price="{{ product.price }}" 
+                  data-image="{{ product.image_url }}">
+            <i class="bi bi-cart-plus"></i> أضف للسلة
+          </button>
+          <a href="/product/{{ product.id }}" class="btn btn-outline btn-sm" style="color:var(--text-main);border-color:var(--border-color);">
+            التفاصيل
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div style="background:var(--card-bg);padding:4rem 2rem;text-align:center;border-radius:var(--radius-md);border:1px solid var(--border-color);margin-bottom:3rem;">
+    <i class="bi bi-inbox" style="font-size:3.5rem;color:var(--text-muted);margin-bottom:1rem;display:inline-block;"></i>
+    <h3 style="font-size:1.3rem;font-weight:700;margin-bottom:0.5rem;">لا توجد منتجات مطابقة للبحث</h3>
+    <p style="color:var(--text-muted);margin-bottom:1.5rem;">جرب البحث بكلمات أخرى أو اختر قسماً آخر.</p>
+    <a href="/products" class="btn btn-primary">عرض جميع المنتجات</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

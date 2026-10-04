@@ -1,0 +1,258 @@
+{% extends "admin/base.html" %}
+
+{% block title %}إعدادات المتجر{% endblock %}
+{% block page_title %}إعدادات المتجر والشعار وأسعار الصرف{% endblock %}
+
+{% block admin_body %}
+<div style="background:#fff;border:1px solid var(--border-color);border-radius:var(--radius-md);padding:1.5rem;box-shadow:var(--shadow-sm);max-width:850px;box-sizing:border-box;">
+  <form action="/admin/settings/save" method="POST" id="settings-form">
+
+    <!-- قسم الشعار والهوية البصرية المتكامل -->
+    <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:1.2rem;border-bottom:2px solid var(--primary-color);padding-bottom:0.6rem;color:var(--secondary-color);display:flex;align-items:center;gap:0.5rem;">
+      <i class="bi bi-image" style="color:var(--primary-color);"></i> شعار المتجر والهوية البصرية
+    </h3>
+
+    <div style="background:#f8fafc;border:1px solid var(--border-color);border-radius:var(--radius-md);padding:1.25rem;margin-bottom:2rem;">
+      
+      <!-- الطريقة الأولى: رفع صورة الشعار مباشرة من الهاتف أو الكمبيوتر -->
+      <div style="margin-bottom:1.5rem;background:#fff;padding:1.2rem;border-radius:var(--radius-md);border:1px solid var(--border-color);">
+        <label style="font-weight:800;color:var(--secondary-color);display:block;margin-bottom:0.4rem;font-size:0.95rem;">
+          <i class="bi bi-cloud-arrow-up-fill" style="color:var(--primary-color);"></i> الطريقة 1: رفع صورة الشعار من هاتفك أو جهازك (الأسهل)
+        </label>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.8rem;">
+          اضغط الزر الأخضر أدناه لاختيار صورة الشعار من معرض الصور في هاتفك (PNG أو JPG أو SVG):
+        </p>
+
+        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+          <label style="display:inline-flex;align-items:center;gap:0.6rem;background:#059669 !important;color:#ffffff !important;padding:0.75rem 1.5rem !important;border-radius:8px !important;cursor:pointer;font-weight:800 !important;font-size:1rem !important;border:2px solid #047857;box-shadow:0 3px 6px rgba(0,0,0,0.12);">
+            <i class="bi bi-camera-fill" style="font-size:1.3rem;"></i>
+            <span>📷 اختيار صورة من معرض الهاتف</span>
+            <input type="file" id="logo-file-picker" accept="image/*" style="display:none;" onchange="handleFileUpload(this)">
+          </label>
+
+          <button type="button" class="btn btn-outline btn-sm" onclick="clearLogo()" style="color:var(--danger-color);border-color:var(--danger-color);">
+            <i class="bi bi-trash"></i> إزالة الشعار
+          </button>
+        </div>
+        <div id="upload-status" style="margin-top:0.6rem;font-size:0.85rem;color:var(--primary-color);font-weight:700;display:none;"></div>
+      </div>
+
+      <!-- الطريقة الثانية: كتابة رابط صورة مباشر من الإنترنت -->
+      <div class="form-group" style="margin-bottom:1.5rem;">
+        <label style="font-weight:800;color:var(--secondary-color);display:block;margin-bottom:0.4rem;font-size:0.95rem;">
+          <i class="bi bi-link-45deg" style="color:var(--accent-color);"></i> الطريقة 2: أو إدخال رابط مباشر لصورة الشعار (URL):
+        </label>
+        <input type="text" id="logo-url-input" name="store_logo_url" class="form-control" 
+               value="{{ settings.store_logo_url }}" 
+               placeholder="ضع رابط صورة الشعار هنا أو ارفعها من الزر أعلاه" 
+               oninput="updateLogoPreview(this.value)">
+      </div>
+
+      <!-- الطريقة الثالثة: نماذج شعارات بيطرية احترافية جاهزة بضغطة زر -->
+      <div style="margin-bottom:1.5rem;">
+        <span style="font-size:0.9rem;font-weight:800;color:var(--secondary-color);display:block;margin-bottom:0.6rem;">
+          <i class="bi bi-stars" style="color:var(--warning-color);"></i> الطريقة 3: أو اختر نموذج شعار بيطري فخم جاهز فوراً:
+        </span>
+        <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+          <button type="button" class="btn btn-outline btn-sm" onclick="setPresetLogo('https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=150&auto=format&fit=crop&q=80')" style="font-size:0.82rem;color:var(--secondary-color);border-color:var(--border-color);background:#fff;">
+            🐮 رعاية المواشي والثروة الحيوانية
+          </button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="setPresetLogo('https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=150&auto=format&fit=crop&q=80')" style="font-size:0.82rem;color:var(--secondary-color);border-color:var(--border-color);background:#fff;">
+            💊 الصيدلية والأدوية البيطرية
+          </button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="setPresetLogo('https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=150&auto=format&fit=crop&q=80')" style="font-size:0.82rem;color:var(--secondary-color);border-color:var(--border-color);background:#fff;">
+            🧪 التحصينات واللقاحات الوقائية
+          </button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="setPresetLogo('https://images.unsplash.com/photo-1583947215259-38e31be8751f?w=150&auto=format&fit=crop&q=80')" style="font-size:0.82rem;color:var(--secondary-color);border-color:var(--border-color);background:#fff;">
+            🩺 مستلزمات العيادات الميدانية
+          </button>
+        </div>
+      </div>
+
+      <!-- المعاينة الحية للشعار كما سيظهر للزوار -->
+      <div style="background:#fff;border:1px dashed var(--primary-color);border-radius:var(--radius-md);padding:1rem;">
+        <span style="font-size:0.85rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.5rem;">
+          المعاينة الحية لشعار المتجر:
+        </span>
+        <div id="logo-preview-box" style="display:inline-flex;align-items:center;gap:0.8rem;background:#064e3b;padding:0.6rem 1.4rem;border-radius:var(--radius-md);color:#fff;">
+          <div id="logo-img-container">
+            {% if settings.store_logo_url %}
+              <img id="logo-preview-img" src="{{ settings.store_logo_url }}" alt="شعار المتجر" style="max-height:44px;max-width:140px;object-fit:contain;border-radius:4px;" onerror="this.onerror=null;this.parentElement.innerHTML='<i class=\\'bi bi-shield-plus\\' style=\\'font-size:1.8rem;color:#34d399;\\'></i>';">
+            {% else %}
+              <i id="logo-preview-icon" class="bi bi-shield-plus" style="font-size:1.8rem;color:#34d399;"></i>
+            {% endif %}
+          </div>
+          <span style="font-weight:800;font-size:1.15rem;">{{ settings.store_name }}</span>
+        </div>
+        <small style="display:block;color:var(--text-muted);margin-top:0.5rem;font-size:0.8rem;">
+          لا تنسَ الضغط على زر <strong>«حفظ التعديلات والشعار»</strong> بالأسفل لاعتماد التغييرات نهائياً.
+        </small>
+      </div>
+
+    </div>
+
+    <!-- معلومات المتجر الأساسية -->
+    <h3 style="font-size:1.15rem;font-weight:700;margin-bottom:1.2rem;border-bottom:1px solid var(--border-color);padding-bottom:0.6rem;">
+      <i class="bi bi-shop"></i> المعلومات العامة
+    </h3>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>اسم المتجر</label>
+        <input type="text" name="store_name" class="form-control" value="{{ settings.store_name }}" required>
+      </div>
+      <div class="form-group">
+        <label>العملة الأساسية للمنتجات</label>
+        <input type="text" name="store_currency" class="form-control" value="{{ settings.store_currency }}" required>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>وصف المتجر (يظهر في الهيدر والفوتر و SEO)</label>
+      <textarea name="store_description" rows="2" class="form-control">{{ settings.store_description }}</textarea>
+    </div>
+
+    <!-- أسعار صرف العملات المتعددة -->
+    <h3 style="font-size:1.15rem;font-weight:700;margin:2rem 0 1.2rem;border-bottom:1px solid var(--border-color);padding-bottom:0.6rem;">
+      <i class="bi bi-currency-exchange" style="color:var(--primary-color);"></i> إدارة أسعار صرف العملات المتعددة
+    </h3>
+    <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem;">
+      يتم تحويل أسعار المنتجات في واجهة المتجر وسلة الشراء تلقائياً بناءً على أسعار الصرف المدخلة هنا:
+    </p>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>سعر صرف 1 دولار أمريكي ($) بالريال اليمني</label>
+        <input type="number" step="0.1" name="usd_exchange_rate" class="form-control" value="{{ settings.usd_exchange_rate or 535 }}" required>
+        <small style="color:var(--text-muted);font-size:0.8rem;">مثال: 535 ر.ي لكل 1 دولار</small>
+      </div>
+      <div class="form-group">
+        <label>سعر صرف 1 ريال سعودي (ر.س) بالريال اليمني</label>
+        <input type="number" step="0.1" name="sar_exchange_rate" class="form-control" value="{{ settings.sar_exchange_rate or 142 }}" required>
+        <small style="color:var(--text-muted);font-size:0.8rem;">مثال: 142 ر.ي لكل 1 ريال سعودي</small>
+      </div>
+    </div>
+
+    <!-- قنوات التواصل والواتساب -->
+    <h3 style="font-size:1.15rem;font-weight:700;margin:2rem 0 1.2rem;border-bottom:1px solid var(--border-color);padding-bottom:0.6rem;">
+      <i class="bi bi-whatsapp" style="color:var(--whatsapp-color);"></i> إعدادات واتساب والتواصل للتاجر
+    </h3>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>رقم واتساب المبيعات (مع كود الدولة وبدون + أو أصفار)</label>
+        <input type="text" name="store_whatsapp" class="form-control" value="{{ settings.store_whatsapp }}" required placeholder="967771954200">
+        <small style="color:var(--text-muted);font-size:0.8rem;">هذا الرقم ستصل إليه رسائل وسلات العملاء الجاهزة.</small>
+      </div>
+      <div class="form-group">
+        <label>رقم الهاتف للاتصال المباشر</label>
+        <input type="text" name="store_phone" class="form-control" value="{{ settings.store_phone }}" required>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>البريد الإلكتروني الرسمي للمتجر</label>
+      <input type="email" name="store_email" class="form-control" value="{{ settings.store_email }}">
+    </div>
+
+    <!-- الشحن والتوصيل -->
+    <h3 style="font-size:1.15rem;font-weight:700;margin:2rem 0 1.2rem;border-bottom:1px solid var(--border-color);padding-bottom:0.6rem;">
+      <i class="bi bi-truck"></i> سياسة الشحن والتوصيل
+    </h3>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>رسوم الشحن الافتراضية ({{ settings.store_currency }})</label>
+        <input type="number" name="shipping_fee" class="form-control" value="{{ settings.shipping_fee }}" required>
+      </div>
+      <div class="form-group">
+        <label>الحد الأدنى للشحن المجاني ({{ settings.store_currency }})</label>
+        <input type="number" name="free_shipping_threshold" class="form-control" value="{{ settings.free_shipping_threshold }}" required>
+      </div>
+    </div>
+
+    <!-- قنوات الدفع المدعومة -->
+    <h3 style="font-size:1.15rem;font-weight:700;margin:2rem 0 1.2rem;border-bottom:1px solid var(--border-color);padding-bottom:0.6rem;">
+      <i class="bi bi-credit-card"></i> قنوات إتمام الطلب والدفع
+    </h3>
+
+    <div style="display:flex;flex-direction:column;gap:1rem;margin-bottom:2rem;">
+      <label style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;">
+        <input type="checkbox" name="enable_whatsapp_order" value="1" {% if settings.enable_whatsapp_order == '1' %}checked{% endif %}>
+        <strong>تفعيل الطلب المباشر عبر واتساب للتاجر</strong>
+      </label>
+
+      <label style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;">
+        <input type="checkbox" name="enable_cod" value="1" {% if settings.enable_cod == '1' %}checked{% endif %}>
+        <strong>تفعيل الدفع نقداً عند الاستلام (Cash on Delivery)</strong>
+      </label>
+
+      <label style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;">
+        <input type="checkbox" name="enable_online_payment" value="1" {% if settings.enable_online_payment == '1' %}checked{% endif %}>
+        <strong>تفعيل بوابة الدفع الإلكتروني (البطاقات البنكية)</strong>
+      </label>
+    </div>
+
+    <button type="submit" style="display:inline-flex;align-items:center;gap:0.6rem;background:#059669 !important;color:#ffffff !important;padding:0.9rem 2.8rem !important;border-radius:8px !important;cursor:pointer;font-weight:800 !important;font-size:1.1rem !important;border:none;box-shadow:0 3px 6px rgba(0,0,0,0.1);">
+      <i class="bi bi-save-fill"></i> حفظ التعديلات والشعار
+    </button>
+  </form>
+</div>
+
+<script>
+// تحديث المعاينة الحية فوراً
+function updateLogoPreview(url) {
+  const container = document.getElementById('logo-img-container');
+  if (url && url.trim()) {
+    container.innerHTML = `<img id="logo-preview-img" src="${url.trim()}" alt="شعار المتجر" style="max-height:44px;max-width:140px;object-fit:contain;border-radius:4px;" onerror="this.onerror=null;this.parentElement.innerHTML='<i class=\\'bi bi-shield-plus\\' style=\\'font-size:1.8rem;color:#34d399;\\'></i>';">`;
+  } else {
+    container.innerHTML = `<i class="bi bi-shield-plus" style="font-size:1.8rem;color:#34d399;"></i>`;
+  }
+}
+
+// قراءة ملف الصورة من ألبوم الهاتف وتحويله فوراً إلى Data URL
+function handleFileUpload(input) {
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    const statusDiv = document.getElementById('upload-status');
+    
+    // التحقق من الحجم
+    if (file.size > 3 * 1024 * 1024) {
+      alert('حجم الصورة كبير، يرجى اختيار صورة بحجم أقل من 3 ميغابايت لتسريع التحميل');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const base64Data = e.target.result;
+      document.getElementById('logo-url-input').value = base64Data;
+      updateLogoPreview(base64Data);
+      
+      statusDiv.style.display = 'block';
+      statusDiv.innerHTML = `<i class="bi bi-check-circle-fill"></i> تم اختيار صورة (${file.name}) بنجاح! اضغط "حفظ التعديلات والشعار" بالأسفل لتثبيتها.`;
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+// اختيار نموذج جاهز بضغطة زر
+function setPresetLogo(url) {
+  const input = document.getElementById('logo-url-input');
+  input.value = url;
+  updateLogoPreview(url);
+  const statusDiv = document.getElementById('upload-status');
+  statusDiv.style.display = 'block';
+  statusDiv.innerHTML = `<i class="bi bi-check-circle-fill"></i> تم اختيار النموذج! اضغط "حفظ التعديلات والشعار" بالأسفل لتثبيته.`;
+}
+
+// إزالة الشعار
+function clearLogo() {
+  const input = document.getElementById('logo-url-input');
+  input.value = '';
+  updateLogoPreview('');
+  const statusDiv = document.getElementById('upload-status');
+  statusDiv.style.display = 'block';
+  statusDiv.innerHTML = `تم تفريغ الشعار. اضغط "حفظ التعديلات والشعار" للعودة إلى الشعار الافتراضي.`;
+}
+</script>
+{% endblock %}

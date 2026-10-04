@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}إتمام الطلب - {{ settings.store_name }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:2.5rem;">
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">إتمام عملية الشراء</h1>
+      <p class="section-subtitle">أدخل تفاصيل التوصيل واختر طريقة الدفع المناسبة لك</p>
+    </div>
+  </div>
+
+  <form id="checkout-form" action="/checkout" method="POST">
+    <!-- حقول مخفية -->
+    <input type="hidden" name="cart_items_json" id="checkout-cart-items-input">
+    <input type="hidden" name="payment_method" id="payment_method_input" value="whatsapp">
+    <input type="hidden" name="order_currency" id="order_currency_input" value="YER">
+
+    <div class="checkout-layout">
+      <!-- نموذج بيانات العميل وطرق الدفع -->
+      <div>
+        <!-- بيانات التوصيل -->
+        <div class="checkout-card" style="margin-bottom:2rem;">
+          <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:1.5rem;display:flex;align-items:center;gap:0.5rem;">
+            <i class="bi bi-geo-alt-fill" style="color:var(--primary-color);"></i> بيانات الشحن والتوصيل
+          </h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="customer_name">الاسم الكامل *</label>
+              <input type="text" name="customer_name" id="customer_name" class="form-control" placeholder="مثال: محمد علي" required>
+            </div>
+            <div class="form-group">
+              <label for="customer_phone">رقم الهاتف / الواتساب *</label>
+              <input type="tel" name="customer_phone" id="customer_phone" class="form-control" placeholder="مثال: 770000000" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="customer_city">المدينة / المحافظة *</label>
+              <input type="text" name="customer_city" id="customer_city" class="form-control" placeholder="مثال: صنعاء، حجة، عدن" required>
+            </div>
+            <div class="form-group">
+              <label for="customer_email">البريد الإلكتروني (اختياري)</label>
+              <input type="email" name="customer_email" id="customer_email" class="form-control" placeholder="name@example.com">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="customer_address">العنوان بالتفصيل *</label>
+            <input type="text" name="customer_address" id="customer_address" class="form-control" placeholder="الشارع، الحي، أقرب معلم بارز" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="notes">ملاحظات إضافية للتوصيل (اختياري)</label>
+            <textarea name="notes" id="notes" rows="2" class="form-control" placeholder="أي تعليمات خاصة للمندوب أو وقت التوصيل المفضل"></textarea>
+          </div>
+        </div>
+
+        <!-- طرق الدفع الثلاثة -->
+        <div class="checkout-card">
+          <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:1.2rem;display:flex;align-items:center;gap:0.5rem;">
+            <i class="bi bi-wallet2" style="color:var(--primary-color);"></i> اختر طريقة الدفع وتأكيد الطلب
+          </h3>
+
+          <div class="payment-tabs">
+            <!-- 1. واتساب -->
+            <div class="payment-tab whatsapp-tab active" data-method="whatsapp">
+              <i class="bi bi-whatsapp"></i>
+              <strong style="font-size:0.95rem;">إرسال عبر واتساب</strong>
+              <small style="color:var(--text-muted);font-size:0.8rem;">تأكيد فوري عبر المحادثة</small>
+            </div>
+
+            <!-- 2. الدفع عند الاستلام -->
+            <div class="payment-tab" data-method="cod">
+              <i class="bi bi-cash-coin"></i>
+              <strong style="font-size:0.95rem;">الدفع عند الاستلام</strong>
+              <small style="color:var(--text-muted);font-size:0.8rem;">ادفع نقداً عند بابك</small>
+            </div>
+
+            <!-- 3. بوابة الدفع الإلكتروني -->
+            <div class="payment-tab" data-method="online">
+              <i class="bi bi-credit-card"></i>
+              <strong style="font-size:0.95rem;">بطاقة بنكية / إلكتروني</strong>
+              <small style="color:var(--text-muted);font-size:0.8rem;">فيزا / ماستركارد / محافظ</small>
+            </div>
+          </div>
+
+          <!-- تفاصيل طريقة الدفع: واتساب -->
+          <div id="whatsapp-details-box" class="payment-details-box" style="border-right:4px solid var(--whatsapp-color);">
+            <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.5rem;">
+              <i class="bi bi-whatsapp" style="font-size:1.4rem;color:var(--whatsapp-color);"></i>
+              <h4 style="font-size:1rem;color:var(--secondary-color);">الطلب السريع والمباشر عبر واتساب</h4>
+            </div>
+            <p style="font-size:0.9rem;color:var(--text-muted);line-height:1.6;">
+              عند النقر على زر التأكيد، سيتم حفظ طلبك بالعملة المختارة وتجهيز رسالة نصية منسقة بجميع أصناف سلتك وعنوانك لإرسالها مباشرة لرقم مبيعات المتجر عبر تطبيق واتساب لإنهاء الشحن والتجهيز.
+            </p>
+          </div>
+
+          <!-- تفاصيل طريقة الدفع: عند الاستلام -->
+          <div id="cod-details-box" class="payment-details-box" style="display:none;border-right:4px solid var(--primary-color);">
+            <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.5rem;">
+              <i class="bi bi-box-seam" style="font-size:1.4rem;color:var(--primary-color);"></i>
+              <h4 style="font-size:1rem;color:var(--secondary-color);">الدفع نقداً عند استلام الشحنة (COD)</h4>
+            </div>
+            <p style="font-size:0.9rem;color:var(--text-muted);line-height:1.6;">
+              سيصلك اتصال من فريق الشحن لتأكيد العنوان وموعد التسليم. يمكنك فحص المنتجات وسداد المبلغ نقداً للمندوب فور الاستلام.
+            </p>
+          </div>
+
+          <!-- تفاصيل طريقة الدفع: بوابة الدفع -->
+          <div id="online-details-box" class="payment-details-box" style="display:none;border-right:4px solid #4f46e5;">
+            <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;">
+              <i class="bi bi-shield-lock" style="font-size:1.4rem;color:#4f46e5;"></i>
+              <h4 style="font-size:1rem;color:var(--secondary-color);">بوابة الدفع الإلكتروني الآمنة (SSL 256-bit)</h4>
+            </div>
+            <div class="form-group">
+              <label>رقم البطاقة (Card Number)</label>
+              <input type="text" class="form-control" placeholder="4000 1234 5678 9010" maxlength="19">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>تاريخ الانتهاء (MM/YY)</label>
+                <input type="text" class="form-control" placeholder="12/28" maxlength="5">
+              </div>
+              <div class="form-group">
+                <label>رمز الأمان (CVV)</label>
+                <input type="password" class="form-control" placeholder="123" maxlength="4">
+              </div>
+            </div>
+            <span style="font-size:0.8rem;color:var(--text-muted);display:block;">
+              <i class="bi bi-check-circle"></i> يتم تشفير ومصادقة عمليات الدفع الرقمية بأعلى معايير الأمان العالمية.
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ملخص الطلب والزر النهائي -->
+      <div>
+        <div class="summary-card">
+          <h3 style="font-size:1.2rem;font-weight:800;margin-bottom:1.2rem;padding-bottom:0.8rem;border-bottom:1px solid var(--border-color);">
+            محتويات سلة الشراء
+          </h3>
+
+          <div id="checkout-items-summary" style="margin-bottom:1.2rem;max-height:220px;overflow-y:auto;padding-left:0.5rem;">
+            <!-- Rendered dynamically by main.js in chosen currency -->
+          </div>
+
+          <div class="summary-row">
+            <span>المجموع الفرعي:</span>
+            <span id="checkout-subtotal" style="font-weight:700;">0</span>
+          </div>
+
+          <div class="summary-row">
+            <span>رسوم الشحن:</span>
+            <span id="checkout-shipping" style="font-weight:700;">0</span>
+          </div>
+
+          <div class="summary-row total">
+            <span>الإجمالي المستحق:</span>
+            <span id="checkout-total">0</span>
+          </div>
+
+          <button type="submit" id="submit-order-btn" class="btn btn-whatsapp" style="width:100%;margin-top:1.5rem;padding:1rem;font-size:1.1rem;">
+            <i class="bi bi-whatsapp"></i> إرسال الطلب عبر واتساب وتأكيده
+          </button>
+
+          <div style="text-align:center;margin-top:1.2rem;font-size:0.85rem;color:var(--text-muted);">
+            <i class="bi bi-lock-fill"></i> جميع بياناتك الشخصية والمالية مشفرة ومحمية بالكامل
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

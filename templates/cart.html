@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}سلة التسوق - {{ settings.store_name }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:2.5rem;">
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">سلة التسوق</h1>
+      <p class="section-subtitle">مراجعة المنتجات المحددة وتأكيد الكميات قبل إتمام الطلب</p>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div id="cart-empty-state" style="display:none;background:var(--card-bg);padding:4rem 2rem;text-align:center;border-radius:var(--radius-md);border:1px solid var(--border-color);margin-bottom:3rem;">
+    <i class="bi bi-cart-x" style="font-size:3.5rem;color:var(--text-muted);margin-bottom:1rem;display:inline-block;"></i>
+    <h3 style="font-size:1.3rem;font-weight:700;margin-bottom:0.5rem;">سلة التسوق فارغة حالياً</h3>
+    <p style="color:var(--text-muted);margin-bottom:1.5rem;">لم تقم بإضافة أي منتجات للسلة بعد. تصفح أحدث منتجاتنا وأضف ما يعجبك.</p>
+    <a href="/products" class="btn btn-primary">ابدأ التسوق الآن</a>
+  </div>
+
+  <!-- Cart Content -->
+  <div class="cart-layout" id="cart-content-wrapper">
+    <div class="cart-table-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-color);padding-bottom:1rem;margin-bottom:1rem;">
+        <h3 style="font-size:1.1rem;font-weight:700;">المنتجات المختارة</h3>
+        <button onclick="Cart.clear(); renderCartPage();" style="background:none;border:none;color:var(--danger-color);font-size:0.85rem;cursor:pointer;font-weight:600;">
+          <i class="bi bi-trash"></i> إفراغ السلة
+        </button>
+      </div>
+
+      <div id="cart-items-tbody">
+        <!-- Rendered dynamically by main.js -->
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="summary-card">
+      <h3 style="font-size:1.2rem;font-weight:800;margin-bottom:1.2rem;padding-bottom:0.8rem;border-bottom:1px solid var(--border-color);">
+        ملخص الطلب
+      </h3>
+
+      <div class="summary-row">
+        <span>المجموع الفرعي:</span>
+        <span id="cart-subtotal-val" style="font-weight:700;">0 {{ settings.store_currency }}</span>
+      </div>
+
+      <div class="summary-row">
+        <span>رسوم الشحن والتوصيل:</span>
+        <span id="cart-shipping-val" style="font-weight:700;">{{ settings.shipping_fee }} {{ settings.store_currency }}</span>
+      </div>
+
+      <div style="background:#eff6ff;color:var(--primary-color);padding:0.6rem 0.8rem;border-radius:var(--radius-sm);font-size:0.85rem;margin-bottom:1rem;display:flex;align-items:center;gap:0.4rem;">
+        <i class="bi bi-info-circle"></i>
+        <span>شحن مجاني لجميع الطلبات بقيمة {{ settings.free_shipping_threshold }} {{ settings.store_currency }} فما فوق!</span>
+      </div>
+
+      <div class="summary-row total">
+        <span>الإجمالي النهائي:</span>
+        <span id="cart-total-val">0 {{ settings.store_currency }}</span>
+      </div>
+
+      <a href="/checkout" class="btn btn-primary" style="width:100%;margin-top:1.5rem;padding:0.9rem;font-size:1.1rem;">
+        <i class="bi bi-credit-card-2-front"></i> متابعة عملية الشراء
+      </a>
+
+      <a href="/products" style="display:block;text-align:center;margin-top:1rem;color:var(--text-muted);font-size:0.9rem;">
+        &larr; متابعة التسوق وإضافة المزيد
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ settings.store_name }}{% endblock %}</title>
+
+  <!-- تحسين محركات البحث SEO و Open Graph لمتجر الطوفان البيطري -->
+  <meta name="description" content="{% block meta_description %}{{ settings.store_description }}{% endblock %}">
+  <meta name="robots" content="index, follow">
+  
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+  <meta property="og:title" content="{% block og_title %}{{ settings.store_name }}{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}{{ settings.store_description }}{% endblock %}">
+  <meta property="og:image" content="{% block og_image %}{{ settings.store_logo_url or 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=1200&auto=format&fit=crop&q=80' }}{% endblock %}">
+  <meta property="og:locale" content="ar_AR">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{% block twitter_title %}{{ settings.store_name }}{% endblock %}">
+  <meta name="twitter:description" content="{% block twitter_description %}{{ settings.store_description }}{% endblock %}">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <!-- ملف التنسيقات بنسخة مدمجة مانعة للكاش v=desktop_stable_v6 -->
+  <link rel="stylesheet" href="/static/css/style.css?v=desktop_stable_v6">
+  
+  <!-- تنسيق مصمم الكمبيوتر المستقر - يضمن ظهور كافة الأجزاء بدون أي اقتطاع أو اختفاء -->
+  <style>
+    html, body {
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      min-height: 100vh !important;
+      overflow-x: hidden !important; /* يمنع إزاحة الصفحة ويضمن بقاء الشعار وكافة الأزرار ظاهرة */
+    }
+    .container {
+      width: 100% !important;
+      max-width: 1200px !important;
+      margin: 0 auto !important;
+      padding: 0 1.25rem !important;
+      box-sizing: border-box !important;
+    }
+    /* شريط روابط القائمة المكتبي الكامل - ظاهر دائماً دون اختفاء */
+    .nav-links {
+      display: flex !important;
+      visibility: visible !important;
+      align-items: center !important;
+      gap: 1.2rem !important;
+      list-style: none !important;
+    }
+    .nav-links a {
+      font-weight: 700 !important;
+      color: var(--text-muted) !important;
+      padding: 0.4rem 0.6rem !important;
+      border-radius: var(--radius-sm) !important;
+      white-space: nowrap !important;
+      font-size: 0.95rem !important;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--primary-color) !important;
+      background: #ecfdf5 !important;
+    }
+  </style>
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="desktop-mode">
+
+  <!-- رأس الموقع بتنسيق مصمم الكمبيوتر الدائم (Desktop Header) -->
+  <header class="main-header">
+    <div class="container">
+      <div class="nav-wrapper">
+        <!-- شعار واسم المتجر -->
+        <a href="/" class="brand-logo" title="{{ settings.store_name }}">
+          {% if settings.store_logo_url %}
+            <img src="{{ settings.store_logo_url }}" alt="{{ settings.store_name }}" class="store-custom-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';">
+            <i class="bi bi-shield-plus fallback-logo-icon" style="display:none;"></i>
+          {% else %}
+            <i class="bi bi-shield-plus"></i>
+          {% endif %}
+          <span class="brand-name-text">{{ settings.store_name }}</span>
+        </a>
+
+        <!-- روابط القائمة الرئيسية الكاملة للكمبيوتر - ظاهرة دائماً -->
+        <ul class="nav-links">
+          <li><a href="/" class="{% if active_page == 'home' %}active{% endif %}"><i class="bi bi-house-door"></i> الرئيسية</a></li>
+          <li><a href="/products" class="{% if active_page == 'products' %}active{% endif %}"><i class="bi bi-capsule"></i> الأدوية والمستلزمات</a></li>
+          <li><a href="/#categories"><i class="bi bi-grid"></i> الأقسام البيطرية</a></li>
+          <li><a href="/#features"><i class="bi bi-shield-check"></i> ضمان الجودة</a></li>
+        </ul>
+
+        <!-- الإجراءات ومحول العملات والسلة -->
+        <div class="header-actions">
+          <div class="currency-switcher-wrapper">
+            <select id="currency-switcher" onchange="changeCurrency(this.value)" class="currency-select" aria-label="اختيار العملة">
+              <option value="YER">🇾🇪 ر.ي</option>
+              <option value="USD">🇺🇸 $ USD</option>
+              <option value="SAR">🇸🇦 ر.س</option>
+            </select>
+          </div>
+
+          <a href="/admin" class="btn-admin" title="لوحة إدارة المتجر البيطري">
+            <i class="bi bi-person-gear"></i> <span class="admin-btn-text">لوحة الإدارة</span>
+          </a>
+
+          <a href="/cart" class="cart-btn" aria-label="سلة التسوق" title="سلة المشتريات">
+            <i class="bi bi-cart3"></i>
+            <span class="cart-badge" id="cart-badge-count" style="display: none;">0</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- الفوتر بتنسيق الكمبيوتر الكامل مع شعار المتجر وتوقيع المطور الرسمي المهندس وسيم همدان -->
+  <footer class="main-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="brand-logo" style="color:#fff;margin-bottom:1rem;">
+            {% if settings.store_logo_url %}
+              <img src="{{ settings.store_logo_url }}" alt="{{ settings.store_name }}" class="store-footer-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';">
+              <i class="bi bi-shield-plus" style="color:#34d399;display:none;"></i>
+            {% else %}
+              <i class="bi bi-shield-plus" style="color:#34d399;"></i>
+            {% endif %}
+            <span>{{ settings.store_name }}</span>
+          </div>
+          <p style="font-size:0.95rem;line-height:1.7;">
+            {{ settings.store_description }}
+          </p>
+          <div style="display:flex;gap:1rem;margin-top:1.5rem;font-size:1.4rem;">
+            <a href="https://wa.me/{{ settings.store_whatsapp }}" target="_blank" style="color:var(--whatsapp-color);" title="واتساب الاستشارات والطلبات"><i class="bi bi-whatsapp"></i></a>
+            <a href="#"><i class="bi bi-facebook"></i></a>
+            <a href="#"><i class="bi bi-telegram"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>أقسام المتجر</h4>
+          <ul class="footer-links">
+            <li><a href="/products?category=medicines">أدوية ومضادات حيوية</a></li>
+            <li><a href="/products?category=vitamins-supplements">فيتامينات ومكملات</a></li>
+            <li><a href="/products?category=vaccines">لقاحات وتحصينات</a></li>
+            <li><a href="/products?category=equipment">معدات ومستلزمات مزارع</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>الاستشارات البيطرية</h4>
+          <ul class="footer-links">
+            <li><a href="#">إرشادات الاستخدام والجرعات</a></li>
+            <li><a href="#">برامج تحصين الدواجن والمواشي</a></li>
+            <li><a href="#">الشحن المبرد للأدوية واللقاحات</a></li>
+            <li><a href="#">الأسئلة البيطرية الشائعة</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>تواصل مع الإدارة البيطرية</h4>
+          <p style="margin-bottom:0.8rem;display:flex;align-items:center;gap:0.5rem;">
+            <i class="bi bi-telephone-fill" style="color:#34d399;"></i>
+            <span>هاتف الاستفسارات: {{ settings.store_phone }}</span>
+          </p>
+          <p style="margin-bottom:0.8rem;display:flex;align-items:center;gap:0.5rem;">
+            <i class="bi bi-whatsapp" style="color:var(--whatsapp-color);"></i>
+            <span>واتساب الطلبات: {{ settings.store_whatsapp }}</span>
+          </p>
+          <p style="display:flex;align-items:center;gap:0.5rem;">
+            <i class="bi bi-envelope-fill" style="color:#34d399;"></i>
+            <span>{{ settings.store_email }}</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- تذييل الصفحة وتوقيع المطور المهندس وسيم همدان -->
+      <div class="footer-bottom">
+        <p style="font-size:0.95rem;margin-bottom:0.4rem;">
+          © 2026 جميع الحقوق محفوظة لـ <strong>{{ settings.store_name }}</strong>
+        </p>
+        <p style="font-size:0.9rem;color:#a7f3d0;display:flex;align-items:center;justify-content:center;gap:0.5rem;flex-wrap:wrap;">
+          <span>تصميم وتطوير:</span>
+          <a href="https://wa.me/967771954200" target="_blank" style="color:#34d399;font-weight:700;display:inline-flex;align-items:center;gap:0.3rem;">
+            <i class="bi bi-code-slash"></i> المهندس وسيم همدان
+          </a>
+          <span style="color:#065f46;">|</span>
+          <span>هاتف المطور:</span>
+          <a href="tel:+967771954200" style="color:#d1fae5;direction:ltr;font-weight:600;">
+            +967 771 954 200
+          </a>
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.STORE_CURRENCY = "{{ settings.store_currency }}";
+    window.SHIPPING_FEE = {{ settings.shipping_fee }};
+    window.FREE_SHIPPING_THRESHOLD = {{ settings.free_shipping_threshold }};
+    window.STORE_WHATSAPP = "{{ settings.store_whatsapp }}";
+    window.USD_RATE = {{ settings.usd_exchange_rate or 535 }};
+    window.SAR_RATE = {{ settings.sar_exchange_rate or 142 }};
+  </script>
+  <script src="/static/js/main.js?v=desktop_stable_v6"></script>
+</body>
+</html>
